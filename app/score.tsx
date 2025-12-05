@@ -88,7 +88,7 @@ export default function FreudScoreScreen() {
 
                 <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                     {scoreHistory.map((item, idx) => (
-                        <TouchableOpacity key={idx} style={styles.historyCard} onPress={() => router.push('/score-insights')}>
+                        <TouchableOpacity key={idx} style={styles.historyCard} onPress={() => router.push('/insights')}>
                             <View style={styles.dateBox}>
                                 <Text style={styles.month}>{item.date.split(' ')[0]}</Text>
                                 <Text style={styles.day}>{item.date.split(' ')[1]}</Text>
