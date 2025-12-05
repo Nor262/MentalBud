@@ -1,133 +1,106 @@
-import { Colors, Layout, Spacing, Typography } from '@/constants/theme';
+import { Spacing, Typography } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
+import React from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
 
-interface Message {
-    id: string;
-    text: string;
-    isUser: boolean;
-    timestamp: Date;
-}
+const { width } = Dimensions.get('window');
 
-export default function ChatbotScreen() {
-    const [messages, setMessages] = useState<Message[]>([
-        { id: '1', text: "Hello! I'm Freud AI. How are you feeling today?", isUser: false, timestamp: new Date() }
-    ]);
-    const [inputText, setInputText] = useState('');
-    const flatListRef = useRef<FlatList>(null);
-
-    const sendMessage = () => {
-        if (!inputText.trim()) return;
-
-        const userMsg: Message = {
-            id: Date.now().toString(),
-            text: inputText,
-            isUser: true,
-            timestamp: new Date(),
-        };
-
-        setMessages(prev => [...prev, userMsg]);
-        setInputText('');
-
-        setTimeout(() => {
-            const responses = [
-                "I hear you. Tell me more about that.",
-                "That sounds challenging. How does it make you feel physically?",
-                "It's okay to feel that way. I'm here to listen.",
-                "What do you think triggered this feeling?",
-                "Have you taken a deep breath recently? Let's try one together."
-            ];
-            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-            const aiMsg: Message = {
-                id: (Date.now() + 1).toString(),
-                text: randomResponse,
-                isUser: false,
-                timestamp: new Date(),
-            };
-            setMessages(prev => [...prev, aiMsg]);
-        }, 1000);
-    };
-
-    useEffect(() => {
-        setTimeout(() => flatListRef.current?.scrollToEnd(), 100);
-    }, [messages]);
-
-    const renderItem = ({ item }: { item: Message }) => {
-        const isUser = item.isUser;
-        return (
-            <View style={[
-                styles.messageContainer,
-                isUser ? styles.userMessageContainer : styles.aiMessageContainer
-            ]}>
-                {!isUser && (
-                    <View style={styles.avatar}>
-                        <LinearGradient
-                            colors={Colors.dark.primaryGradient as any}
-                            style={styles.avatarGradient}
-                        >
-                            <Ionicons name="sparkles" size={12} color="#FFF" />
-                        </LinearGradient>
-                    </View>
-                )}
-                <View style={[
-                    styles.bubble,
-                    isUser ? styles.userBubble : styles.aiBubble
-                ]}>
-                    <Text style={[styles.messageText, isUser && styles.userMessageText]}>
-                        {item.text}
-                    </Text>
-                </View>
-            </View>
-        );
-    };
-
+export default function ChatDashboardScreen() {
     return (
         <View style={styles.container}>
-            <StatusBar style="light" />
-            <KeyboardAvoidingView
-                style={styles.container}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-            >
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Freud AI</Text>
-                    <View style={styles.onlineBadge}>
-                        <View style={styles.dot} />
-                        <Text style={styles.headerSubtitle}>Online</Text>
+            {/* Background Abstract Shapes (Simulated with SVG) */}
+            <View style={StyleSheet.absoluteFillObject}>
+                <Svg height="100%" width="100%">
+                    <Circle cx="10%" cy="20%" r="50" fill="#2C211B" />
+                    <Circle cx="90%" cy="60%" r="80" fill="#2C211B" />
+                    <Path d={`M0,${width} Q${width / 2},${width - 100} ${width},${width}`} fill="#2C211B" opacity={0.5} />
+                </Svg>
+            </View>
+
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.circleBtn}>
+                    <Ionicons name="chevron-back" size={24} color="#FFF" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>My Conversations</Text>
+                <View style={styles.badge}><Text style={styles.badgeText}>BASIC</Text></View>
+            </View>
+
+            {/* Hero Stats */}
+            <View style={styles.heroContent}>
+                <Text style={styles.heroCount}>1571</Text>
+                <Text style={styles.heroLabel}>Total Conversations</Text>
+
+                <View style={styles.statsRow}>
+                    <View style={styles.statItem}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <Ionicons name="chatbubble-ellipses-outline" size={18} color="#FFF" />
+                            <Text style={styles.statVal}>32</Text>
+                        </View>
+                        <Text style={styles.statLabel}>Left this month</Text>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.statItem}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <Ionicons name="bar-chart-outline" size={18} color="#FFF" />
+                            <Text style={styles.statVal}>Slow</Text>
+                        </View>
+                        <Text style={styles.statLabel}>Response & Support</Text>
                     </View>
                 </View>
+            </View>
 
-                <FlatList
-                    ref={flatListRef}
-                    data={messages}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={styles.listContent}
-                    style={styles.list}
-                />
+            {/* Action Buttons Row */}
+            <View style={styles.actionRow}>
+                {/* Orange Filter/History Button */}
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FF8C60' }]} onPress={() => router.push('/chat/history')}>
+                    <Ionicons name="options" size={24} color="#FFF" />
+                </TouchableOpacity>
 
-                <View style={styles.inputArea}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Type a message..."
-                        value={inputText}
-                        onChangeText={setInputText}
-                        placeholderTextColor={Colors.dark.textSecondary}
-                    />
-                    <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-                        <LinearGradient
-                            colors={Colors.dark.primaryGradient as any}
-                            style={styles.sendGradient}
-                        >
-                            <Ionicons name="arrow-up" size={20} color="#FFF" />
-                        </LinearGradient>
-                    </TouchableOpacity>
+                {/* Main Add Button (White) */}
+                <TouchableOpacity style={styles.mainAddBtn} onPress={() => router.push('/chat/new')}>
+                    <Ionicons name="add" size={32} color="#1F1610" />
+                </TouchableOpacity>
+
+                {/* Green Settings Button */}
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#8CAD65' }]} onPress={() => router.push('/chat/settings')}>
+                    <Ionicons name="settings-outline" size={24} color="#FFF" />
+                </TouchableOpacity>
+            </View>
+
+            {/* Upgrade Pro Card - Green */}
+            <TouchableOpacity style={styles.proCard} onPress={() => router.push('/pro/upgrade')}>
+                {/* Decoration */}
+                <View style={styles.proDecor}>
+                    <Ionicons name="happy-outline" size={80} color="rgba(0,0,0,0.1)" />
                 </View>
-            </KeyboardAvoidingView>
+
+                <View style={styles.botAvatar}>
+                    <View style={styles.botFace}><Text style={{ fontSize: 20 }}>🤖</Text></View>
+                </View>
+
+                <View style={{ flex: 1, paddingLeft: 16 }}>
+                    <Text style={styles.proTitle}>Upgrade to Pro!</Text>
+
+                    <View style={styles.benefitRow}>
+                        <Ionicons name="checkmark-circle" size={16} color="#FFF" />
+                        <Text style={styles.benefitText}>24/7 Live & Fast Support</Text>
+                    </View>
+                    <View style={styles.benefitRow}>
+                        <Ionicons name="checkmark-circle" size={16} color="#FFF" />
+                        <Text style={styles.benefitText}>Unlimited Conversations!</Text>
+                    </View>
+
+                    <View style={styles.goProBtn}>
+                        <Text style={styles.goProText}>Go Pro, Now!</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+
+            {/* Bottom Spacer for Dock */}
+            <View style={{ height: 100 }} />
         </View>
     );
 }
@@ -135,120 +108,61 @@ export default function ChatbotScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.dark.background,
+        backgroundColor: '#1F1410',
+        paddingHorizontal: Spacing.l,
     },
     header: {
-        paddingTop: Spacing.xl * 1.5,
-        paddingBottom: Spacing.m,
-        paddingHorizontal: Spacing.l,
-        backgroundColor: Colors.dark.surface,
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.dark.border,
-        alignItems: 'center',
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 60, marginBottom: 40,
     },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: Colors.dark.text,
-        fontFamily: Typography.heading,
+    circleBtn: {
+        width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center'
     },
-    onlineBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 4,
-    },
-    dot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: Colors.dark.primary,
-        marginRight: 6,
-    },
-    headerSubtitle: {
-        fontSize: 12,
-        color: Colors.dark.textSecondary,
-        fontWeight: '500',
-    },
-    list: {
-        flex: 1,
-    },
-    listContent: {
-        padding: Spacing.m,
-        paddingBottom: 20,
-    },
-    messageContainer: {
-        flexDirection: 'row',
-        marginBottom: Spacing.m,
-        alignItems: 'flex-end',
-    },
-    userMessageContainer: {
-        justifyContent: 'flex-end',
-    },
-    aiMessageContainer: {
-        justifyContent: 'flex-start',
-    },
-    avatar: {
-        marginRight: Spacing.s,
-    },
-    avatarGradient: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    bubble: {
-        maxWidth: '75%',
-        padding: Spacing.m,
-        borderRadius: Layout.radius.l,
-    },
-    userBubble: {
-        backgroundColor: Colors.dark.primary,
-        borderBottomRightRadius: 4,
-    },
-    aiBubble: {
-        backgroundColor: Colors.dark.surface,
-        borderBottomLeftRadius: 4,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
-    },
-    messageText: {
-        fontSize: 16,
-        color: Colors.dark.text,
-        lineHeight: 22,
-        fontFamily: Typography.body,
-    },
-    userMessageText: {
-        color: '#FFF',
-    },
-    inputArea: {
-        flexDirection: 'row',
-        padding: Spacing.m,
-        paddingBottom: Platform.OS === 'ios' ? 40 : Spacing.m, // Adjust for bottom tab safe area if needed
-        backgroundColor: Colors.dark.surface,
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: Colors.dark.border,
-    },
-    input: {
-        flex: 1,
-        backgroundColor: Colors.dark.background,
-        borderRadius: 25,
-        paddingHorizontal: Spacing.m,
-        paddingVertical: Spacing.s,
-        marginRight: Spacing.m,
-        fontSize: 16,
-        color: Colors.dark.text,
-        height: 50,
-    },
-    sendButton: {
+    headerTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+    badge: { backgroundColor: '#8CAD65', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+    badgeText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
 
+    heroContent: { alignItems: 'center', marginBottom: 50 },
+    heroCount: { fontSize: 80, fontWeight: 'bold', color: '#FFF', fontFamily: Typography.heading, lineHeight: 90 },
+    heroLabel: { color: '#FFF', fontSize: 16, marginBottom: 30 },
+
+    statsRow: { flexDirection: 'row', alignItems: 'center', gap: 30 },
+    statItem: { alignItems: 'center', gap: 4 },
+    statVal: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+    statLabel: { color: '#AAA', fontSize: 12 },
+    divider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.2)' },
+
+    actionRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 20, marginBottom: 50 },
+    actionBtn: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center', elevation: 5 },
+    mainAddBtn: {
+        width: 90, height: 90, borderRadius: 45, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center',
+        shadowColor: "#000", shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20, elevation: 10, zIndex: 10
     },
-    sendGradient: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+
+    proCard: {
+        backgroundColor: '#3E4A35', // Dark Olive Green
+        borderRadius: 30,
+        height: 160,
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-    }
+        padding: 20,
+        overflow: 'hidden',
+        position: 'relative',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)'
+    },
+    proDecor: { position: 'absolute', right: -20, bottom: -20 },
+    botAvatar: {
+        width: 60, height: 80, justifyContent: 'flex-end',
+    },
+    botFace: {
+        width: 50, height: 50, borderRadius: 25, backgroundColor: '#8CAD65', alignItems: 'center', justifyContent: 'center',
+        borderWidth: 2, borderColor: '#FFF'
+    },
+    proTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+    benefitRow: { flexDirection: 'row', gap: 6, marginBottom: 4 },
+    benefitText: { color: '#EEE', fontSize: 10 },
+    goProBtn: {
+        backgroundColor: '#FFF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, alignSelf: 'flex-start', marginTop: 12
+    },
+    goProText: { color: '#2E3B28', fontWeight: 'bold', fontSize: 12 }
 });

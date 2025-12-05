@@ -2,7 +2,7 @@ import { Spacing, Typography } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -121,8 +121,33 @@ export default function ActiveChatScreen() {
         */
     ];
 
+    const scrollViewRef = React.useRef<ScrollView>(null);
+
+    React.useEffect(() => {
+        // Scroll to bottom on mount
+        setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: false });
+        }, 100);
+
+        // Scroll to bottom when keyboard opens
+        const keyboardDidShowListener = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+            () => {
+                setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+            }
+        );
+
+        return () => {
+            keyboardDidShowListener.remove();
+        };
+    }, []);
+
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        >
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
@@ -135,7 +160,11 @@ export default function ActiveChatScreen() {
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.content}>
+            <ScrollView
+                ref={scrollViewRef}
+                contentContainerStyle={styles.content}
+                onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+            >
                 {messages.map(msg => <ChatMessage key={msg.id} msg={msg} />)}
             </ScrollView>
 
@@ -153,7 +182,7 @@ export default function ActiveChatScreen() {
                     <Ionicons name="return-down-back" size={24} color="#FFF" />
                 </TouchableOpacity>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 
@@ -191,7 +220,7 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: Spacing.l,
-        paddingBottom: 100,
+        paddingBottom: 20, // Reduced padding as InputArea is no longer absolute
     },
     msgContainer: {
         marginBottom: Spacing.l,
@@ -233,12 +262,12 @@ const styles = StyleSheet.create({
     bubbleLeft: {
         backgroundColor: '#2C211B',
         borderRadius: 24,
-        borderTopLeftRadius: 4,
+        borderBottomLeftRadius: 4,
     },
     bubbleRight: {
         backgroundColor: '#C8A087', // Light brownish/skin tone from design
         borderRadius: 24,
-        borderTopRightRadius: 4,
+        borderBottomRightRadius: 4,
     },
     msgText: {
         color: '#FFF',
@@ -349,10 +378,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     inputArea: {
-        position: 'absolute',
-        bottom: 20,
-        left: 20,
-        right: 20,
+        // Positioned statically at bottom via Flexbox
+        marginBottom: 20,
+        marginHorizontal: 20,
         backgroundColor: '#2C211B',
         borderRadius: 30,
         height: 60,

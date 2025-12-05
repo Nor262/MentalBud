@@ -1,14 +1,18 @@
-import { Layout, Spacing, Typography } from '@/constants/theme';
+import { Spacing, Typography } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const chats = [
-    { id: '1', title: 'Recent Breakup, felt s...', emotion: 'Sad', count: 478, date: '2m' },
-    { id: '2', title: 'Shitty Teacher at Uni...', emotion: 'Happy', count: 478, date: '1d' }, // Ironically happy?
-    { id: '3', title: 'Just wanna stop exist...', emotion: 'Overjoyed', count: 478, date: '3d' }, // Placeholder emotions from design
-    { id: '4', title: 'More Xans this Xmas...', emotion: 'Sad', count: 478, date: '1w' },
+const recentChats = [
+    { id: '1', title: 'Recent Breakup, felt s...', emotion: 'Sad', count: 478, date: '2m', color: '#FF8C60', icon: 'heart-dislike' },
+    { id: '2', title: 'Shitty Teacher at Uni...', emotion: 'Happy', count: 478, date: '1d', color: '#FBC02D', icon: 'school' },
+    { id: '3', title: 'Just wanna stop exist...', emotion: 'Overjoyed', count: 478, date: '3d', color: '#8CAD65', icon: 'happy' },
+];
+
+const pastChats = [
+    { id: '4', title: 'More Xans this Xmas...', emotion: 'Sad', count: 478, date: '1w', color: '#FF8C60', icon: 'medical' },
+    { id: '5', title: 'Family Issues again...', emotion: 'Angry', count: 120, date: '2w', color: '#D84315', icon: 'people' },
 ];
 
 export default function ChatHistoryScreen() {
@@ -17,12 +21,14 @@ export default function ChatHistoryScreen() {
             {/* Orange Header Card */}
             <View style={styles.orangeHeader}>
                 <View style={styles.topRow}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+                    <TouchableOpacity onPress={() => router.back()} style={styles.circleBtn}>
                         <Ionicons name="chevron-back" size={24} color="#FFF" />
                     </TouchableOpacity>
                     <Ionicons name="cellular-outline" size={24} color="#FFF" />
                 </View>
+
                 <Text style={styles.bigTitle}>My Conversations</Text>
+
                 <View style={styles.statsRow}>
                     <View style={styles.statTag}>
                         <Ionicons name="time-outline" size={16} color="#FFF" />
@@ -33,48 +39,75 @@ export default function ChatHistoryScreen() {
                         <Text style={styles.statText}>32 Left this Month</Text>
                     </View>
                 </View>
-                {/* Create New FAB in middle */}
-                <TouchableOpacity style={styles.fab} onPress={() => router.push('/chat/new')}>
-                    <Ionicons name="add" size={32} color="#FFF" />
-                </TouchableOpacity>
             </View>
 
-            <View style={styles.content}>
-                <View style={styles.listHeader}>
+            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                {/* Recent Section */}
+                <View style={styles.sectionRow}>
                     <Text style={styles.sectionTitle}>Recent (4)</Text>
                     <TouchableOpacity style={styles.filterBtn}>
-                        <Ionicons name="filter" size={14} color="#FFF" />
+                        <Ionicons name="filter" size={12} color="#FFF" />
                         <Text style={styles.filterText}>Newest</Text>
+                        <Ionicons name="chevron-down" size={12} color="#FFF" />
                     </TouchableOpacity>
                 </View>
 
-                <FlatList
-                    data={chats}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={{ gap: Spacing.m, paddingTop: 30 }}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.chatCard} onPress={() => router.push(`/chat/${item.id}`)}>
-                            <View style={[styles.avatarCircle, { backgroundColor: '#3D342B' }]}>
-                                <Ionicons name="person" size={20} color="#8CAD65" />
-                            </View>
-                            <View style={styles.chatInfo}>
-                                <Text style={styles.chatTitle}>{item.title}</Text>
-                                <View style={styles.chatMeta}>
-                                    <Ionicons name="chatbubble" size={12} color="#8B7D76" />
-                                    <Text style={styles.metaText}>{item.count} Total</Text>
-                                    <View style={styles.emotionBadge}>
-                                        <Ionicons name={item.emotion === 'Sad' ? 'sad' : 'happy'} size={12} color="#FF8C60" />
-                                        <Text style={styles.emotionText}>{item.emotion}</Text>
-                                    </View>
+                {recentChats.map((item) => (
+                    <TouchableOpacity key={item.id} style={styles.chatCard} onPress={() => router.push(`/chat/${item.id}`)}>
+                        <View style={[styles.avatarCircle, { backgroundColor: '#3D342B' }]}>
+                            {/* Icon inside a circle */}
+                            <Ionicons name={item.icon as any} size={20} color="#8CAD65" />
+                        </View>
+                        <View style={styles.chatInfo}>
+                            <Text style={styles.chatTitle}>{item.title}</Text>
+                            <View style={styles.chatMeta}>
+                                <Ionicons name="chatbubble" size={10} color="#8B7D76" />
+                                <Text style={styles.metaText}>{item.count} Total</Text>
+                                <View style={styles.emotionBadge}>
+                                    <Ionicons name={item.emotion === 'Sad' ? 'sad' : 'happy'} size={10} color={item.color} />
+                                    <Text style={[styles.emotionText, { color: item.color }]}>{item.emotion}</Text>
                                 </View>
                             </View>
-                            <TouchableOpacity>
-                                <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
-                            </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity>
+                            <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
                         </TouchableOpacity>
-                    )}
-                />
-            </View>
+                    </TouchableOpacity>
+                ))}
+
+                {/* Past Section */}
+                <View style={[styles.sectionRow, { marginTop: 30 }]}>
+                    <Text style={styles.sectionTitle}>Past (16)</Text>
+                    <TouchableOpacity>
+                        <Ionicons name="settings-outline" size={16} color="#AAA" />
+                    </TouchableOpacity>
+                </View>
+
+                {pastChats.map((item) => (
+                    <TouchableOpacity key={item.id} style={styles.chatCard} onPress={() => router.push(`/chat/${item.id}`)}>
+                        <View style={[styles.avatarCircle, { backgroundColor: '#3D342B' }]}>
+                            <Ionicons name={item.icon as any} size={20} color="#8CAD65" />
+                        </View>
+                        <View style={styles.chatInfo}>
+                            <Text style={styles.chatTitle}>{item.title}</Text>
+                            <View style={styles.chatMeta}>
+                                <Ionicons name="chatbubble" size={10} color="#8B7D76" />
+                                <Text style={styles.metaText}>{item.count} Total</Text>
+                                <View style={styles.emotionBadge}>
+                                    <Ionicons name={item.emotion === 'Sad' ? 'sad' : 'happy'} size={10} color={item.color} />
+                                    <Text style={[styles.emotionText, { color: item.color }]}>{item.emotion}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <TouchableOpacity>
+                            <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                ))}
+
+
+                <View style={{ height: 100 }} />
+            </ScrollView>
         </View>
     );
 }
@@ -86,71 +119,49 @@ const styles = StyleSheet.create({
     },
     orangeHeader: {
         backgroundColor: '#FF8C60', // Burnt Orange
-        height: 220,
+        height: 250,
         borderBottomLeftRadius: 40,
         borderBottomRightRadius: 40,
         paddingHorizontal: Spacing.l,
         paddingTop: 60,
+        marginBottom: 20,
     },
     topRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: Spacing.l,
+        marginBottom: 20,
     },
-    backBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.4)',
-        alignItems: 'center',
-        justifyContent: 'center',
+    circleBtn: {
+        width: 44, height: 44, borderRadius: 22,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.4)',
+        alignItems: 'center', justifyContent: 'center'
     },
     bigTitle: {
-        fontSize: 28,
+        fontSize: 32,
         fontFamily: Typography.heading,
         color: '#FFF',
-        marginBottom: Spacing.m,
+        marginBottom: 20,
     },
     statsRow: {
         flexDirection: 'row',
-        gap: Spacing.m,
+        gap: 20,
     },
     statTag: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: 6,
     },
     statText: {
         color: '#FFF',
-        fontWeight: '600',
-    },
-    fab: {
-        position: 'absolute',
-        bottom: -28, // Half height
-        alignSelf: 'center',
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        backgroundColor: '#FFF', // White contrast
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
-        elevation: 8,
-        zIndex: 10,
+        fontWeight: 'bold',
+        fontSize: 14
     },
     content: {
         flex: 1,
         paddingHorizontal: Spacing.l,
     },
-    listHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 50, // Clearance for FAB
+    sectionRow: {
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16
     },
     sectionTitle: {
         color: '#FFF',
@@ -163,29 +174,31 @@ const styles = StyleSheet.create({
         backgroundColor: '#2C211B',
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 15,
-        gap: 4,
+        borderRadius: 20,
+        gap: 6,
         borderWidth: 1,
         borderColor: '#44352D',
     },
     filterText: {
         color: '#FFF',
-        fontSize: 12,
+        fontSize: 10,
+        fontWeight: 'bold'
     },
     chatCard: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#2C211B',
-        padding: Spacing.m,
-        borderRadius: Layout.radius.xl,
+        padding: 16,
+        borderRadius: 24,
+        marginBottom: 12,
     },
     avatarCircle: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: Spacing.m,
+        marginRight: 16,
     },
     chatInfo: {
         flex: 1,
@@ -193,25 +206,25 @@ const styles = StyleSheet.create({
     chatTitle: {
         color: '#FFF',
         fontWeight: 'bold',
-        marginBottom: 4,
+        marginBottom: 6,
         fontSize: 15,
     },
     chatMeta: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 10,
     },
     metaText: {
         color: '#8B7D76',
-        fontSize: 12,
+        fontSize: 11,
     },
     emotionBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 2
+        gap: 4
     },
     emotionText: {
-        color: '#8B7D76',
-        fontSize: 12,
+        fontSize: 11,
+        fontWeight: 'bold'
     }
 });
