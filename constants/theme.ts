@@ -1,53 +1,76 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Mental Health App Design System - Earthy Coffee Theme
+ * Matches "Freud UI Kit" Figma Community Version
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const palette = {
+  // Bases
+  background: '#1F1410', // Deep Coffee
+  surface: '#2C211B', // Mocha
+  surfaceHighlight: '#44352D',
+
+  // Accents
+  primary: '#8CAD65', // Sage Green (Freud Score/Healthy)
+  primaryGradient: ['#8CAD65', '#A5C978'],
+  secondary: '#FF8C60', // Burnt Orange (Mood)
+  secondaryGradient: ['#FF8C60', '#FFA985'],
+  accent: '#7D5BA6', // Deep Purple (Sleep)
+
+  // New specific colors from screenshots
+  moodSad: '#FF8C60',
+  moodHappy: '#E6C84C', // Gold/Yellow
+  moodNeutral: '#8D7B6F',
+  moodDepressed: '#6A5ACD',
+
+  // Text
+  text: '#FFFFFF',
+  textSecondary: '#AB9C94', // Light Beige/Grey
+  textMuted: '#6E5C54',
+
+  // Borders
+  border: '#44352D',
+};
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    // Forcing Dark Mode visual style even in 'light' scheme
+    ...palette,
+    tint: palette.primary,
+    icon: palette.textSecondary,
+    tabIconDefault: palette.textMuted,
+    tabIconSelected: palette.primary,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    ...palette,
+    tint: palette.primary,
+    icon: palette.textSecondary,
+    tabIconDefault: palette.textMuted,
+    tabIconSelected: palette.primary,
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+export const Spacing = {
+  xs: 6,
+  s: 10,
+  m: 16,
+  l: 24,
+  xl: 32,
+  xxl: 40,
+};
+
+export const Layout = {
+  radius: {
+    s: 12,
+    m: 20,
+    l: 30, // Main Card Radius
+    xl: 40, // Button Radius
+    pill: 100,
+  }
+};
+
+export const Typography = {
+  heading: Platform.select({ ios: 'Georgia', android: 'serif', default: 'serif' }), // Or a rounded typeface if available
+  body: Platform.select({ ios: 'System', android: 'Roboto', default: 'sans-serif' }),
+};
