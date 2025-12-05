@@ -117,6 +117,49 @@ export default function HomeScreen() {
                 ))}
               </View>
             </TouchableOpacity>
+
+            {/* Sleep Card (Purple) */}
+            <TouchableOpacity style={[styles.metricCard, { backgroundColor: '#5E35B1' }]} onPress={() => router.push('/sleep')}>
+              <View style={styles.metricHeader}>
+                <Ionicons name="moon-outline" size={18} color="#FFF" />
+                <Text style={styles.metricTitle}>Sleep</Text>
+              </View>
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Ionicons name="star" size={32} color="#FFF" />
+                <Text style={[styles.scoreVal, { fontSize: 28 }]}>85</Text>
+                <Text style={styles.scoreLabel}>Splendid</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Stress Card (Yellow) */}
+            <TouchableOpacity style={[styles.metricCard, { backgroundColor: '#FBC02D' }]} onPress={() => router.push('/stress')}>
+              <View style={styles.metricHeader}>
+                <Ionicons name="flash-outline" size={18} color="#FFF" />
+                <Text style={styles.metricTitle}>Stress</Text>
+              </View>
+              <View style={{ flex: 1, justifyContent: 'center' }}>
+                <Text style={[styles.moodVal, { marginTop: 0 }]}>Normal</Text>
+                <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.4)', marginTop: 10, borderRadius: 2 }}>
+                  <View style={{ width: '30%', height: '100%', backgroundColor: '#FFF', borderRadius: 2 }} />
+                </View>
+                <Text style={styles.scoreLabel}>Level 3</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Mindful Card (Teal/Green) */}
+            <TouchableOpacity style={[styles.metricCard, { backgroundColor: '#26A69A' }]} onPress={() => router.push('/mindful')}>
+              <View style={styles.metricHeader}>
+                <Ionicons name="time-outline" size={18} color="#FFF" />
+                <Text style={styles.metricTitle}>Mindful</Text>
+              </View>
+              <View style={{ flex: 1, justifyContent: 'center' }}>
+                <Text style={[styles.scoreVal, { fontSize: 24 }]}>2.5h</Text>
+                <Text style={styles.scoreLabel}>Target 8h</Text>
+                <Svg height="30" width="80" style={{ marginTop: 10 }}>
+                  <Path d="M0,15 Q20,5 40,15 T80,15" fill="none" stroke="#FFF" strokeWidth="2" />
+                </Svg>
+              </View>
+            </TouchableOpacity>
           </ScrollView>
 
           {/* Pagination Dots */}
