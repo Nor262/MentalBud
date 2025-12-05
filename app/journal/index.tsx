@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         color: '#FFF', fontSize: 16, marginTop: 10,
     },
     heroFab: {
-        position: 'absolute', bottom: -30, // Half sticking out
+        position: 'absolute', bottom: 5, // Sits on curve (Curve peak is -40, Button H=70, R=35. Bottom 5 puts center at -30 approx)
         width: 70, height: 70, borderRadius: 35, backgroundColor: '#8D6E63',
         alignItems: 'center', justifyContent: 'center',
         borderWidth: 6, borderColor: '#1F1610', zIndex: 10,
