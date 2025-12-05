@@ -90,6 +90,7 @@ export default function HomeScreen() {
             <Text style={styles.sectionTitle}>Mental Health Metrics</Text>
             <Ionicons name="ellipsis-vertical" size={16} color="#AAA" />
           </View>
+
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.metricsRow}>
             {/* Freud Score */}
             <TouchableOpacity style={[styles.metricCard, { backgroundColor: '#8CAD65' }]} onPress={() => router.push('/score')}>
@@ -161,6 +162,7 @@ export default function HomeScreen() {
               </View>
             </TouchableOpacity>
           </ScrollView>
+
 
           {/* Pagination Dots */}
           <View style={styles.pagination}>

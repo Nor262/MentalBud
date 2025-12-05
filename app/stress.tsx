@@ -164,7 +164,7 @@ export default function StressScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1F1610',
+        backgroundColor: '#1F1410',
     },
     header: {
         height: 380,

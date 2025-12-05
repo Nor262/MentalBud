@@ -27,7 +27,7 @@ export default function Index() {
         return <Redirect href="/(auth)/welcome" />;
     }
 
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/" />;
 }
 
 const styles = StyleSheet.create({
@@ -35,6 +35,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: Colors.light.background,
+        backgroundColor: Colors.dark.background,
     }
 });

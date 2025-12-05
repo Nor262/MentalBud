@@ -101,8 +101,11 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: { display: 'none' }, // Completely hide default bar
+        freezeOnBlur: true,
       }}
       tabBar={(props) => <CustomTabBar {...props} />}
+      // @ts-ignore
+      sceneContainerStyle={{ backgroundColor: '#1F1410' }}
     >
       <Tabs.Screen
         name="index"
