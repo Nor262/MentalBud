@@ -1,79 +1,95 @@
 import { Spacing, Typography } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
 
-// Mock Data matching the screenshot
-const chartData = [
-    { day: 'Mon', height: 60, color: '#5D4037', icon: 'sad' }, // Brown, low
-    { day: 'Tue', height: 80, color: '#5D4037', icon: 'sad' },
-    { day: 'Wed', height: 160, color: '#FDD835', icon: 'happy' }, // Yellow, high
-    { day: 'Thu', height: 200, color: '#8CAD65', icon: 'happy' }, // Green, highest
-    { day: 'Fri', height: 120, color: '#FF8C60', icon: 'sad' }, // Orange, medium
-    { day: 'Sat', height: 50, color: '#5D4037', icon: 'sad' },
-    { day: 'Sun', height: 90, color: '#5D4037', icon: 'sad' },
-];
+const MoodFace = ({ mood }: { mood: number }) => {
+    // 0 = Sad, 0.5 = Neutral, 1 = Happy
+    let iconName = "happy";
+    if (mood < 0.3) iconName = "sad";
+    else if (mood < 0.7) iconName = "remove"; // Neutral-ish line
+
+    return <Ionicons name={iconName as any} size={60} color="#5D4037" />;
+};
 
 export default function MoodStatsScreen() {
+    const [sliderVal, setSliderVal] = useState(0.5);
+
     return (
         <View style={styles.container}>
-            {/* Header with Wavy Background */}
+            {/* Header Area */}
             <View style={styles.header}>
-                <Svg height="300" width={width} style={StyleSheet.absoluteFillObject}>
-                    {/* concentric curves for background pattern */}
-                    <Path d={`M${width / 2},150 Q${width},100 ${width},0 L0,0 L0,150 Q0,100 ${width / 2},150`} fill="#3E2D23" />
-                    <Path d={`M${width / 2},300 Q${width},250 ${width},0 L0,0 L0,300 Q0,250 ${width / 2},300`} fill="#3E2D23" opacity={0.3} />
-                    <Path d={`M0,0 L${width},0 L${width},450 Q${width / 2},550 0,450 Z`} fill="#3E2D23" opacity={0.5} />
-                </Svg>
-
                 <View style={styles.navBar}>
                     <TouchableOpacity onPress={() => router.back()} style={styles.circleBtn}>
                         <Ionicons name="chevron-back" size={24} color="#FFF" />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Mood</Text>
-                    <View style={styles.levelBadge}><Text style={styles.levelText}>LEVEL 3</Text></View>
+                    <View style={styles.badge}><Text style={styles.badgeText}>LEVEL 3</Text></View>
                 </View>
 
+                {/* Mood Hero */}
                 <View style={styles.heroContent}>
                     <Text style={styles.heroSub}>Your mood is</Text>
                     <Text style={styles.heroTitle}>Neutral</Text>
 
-                    <View style={styles.faceContainer}>
-                        <Ionicons name="chevron-back" size={24} color="#AAA" />
-                        <View style={styles.hugeFace}>
-                            <Ionicons name="remove" size={80} color="#3E2D23" />
+                    {/* Face Slider Display */}
+                    <View style={styles.faceCircle}>
+                        <MoodFace mood={sliderVal} />
+                    </View>
+
+                    {/* Use arrows to simulate the 'slider' visual from current image, or actual slider */}
+                    <View style={styles.sliderRow}>
+                        <Ionicons name="chevron-back" size={20} color="#AAA" />
+                        <View style={{ flex: 1, paddingHorizontal: 20 }}>
+                            {/* Dummy indicators */}
+                            <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2 }} />
                         </View>
-                        <Ionicons name="chevron-forward" size={24} color="#AAA" />
+                        <Ionicons name="chevron-forward" size={20} color="#AAA" />
                     </View>
                 </View>
+
+                <Svg height="100%" width={width} style={[StyleSheet.absoluteFillObject, { zIndex: -1 }]}>
+                    <Path d={`M0,350 Q${width / 2},450 ${width},350 L${width},0 L0,0 Z`} fill="#3E2D23" />
+                </Svg>
             </View>
 
+            {/* Stats Section */}
             <View style={styles.statsSection}>
-                <View style={styles.statsHeader}>
-                    <Text style={styles.statsTitle}>Mood Statistics</Text>
-                    <Ionicons name="ellipsis-vertical" size={20} color="#666" />
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>Mood Statistics</Text>
+                    <Ionicons name="ellipsis-vertical" size={16} color="#AAA" />
                 </View>
 
-                {/* Bar Chart */}
-                <View style={styles.chartArea}>
-                    {/* Dashed Lines */}
-                    <View style={styles.gridLines}>
-                        <View style={styles.dashLine} />
-                        <View style={styles.dashLine} />
-                        <View style={styles.dashLine} />
-                        <View style={styles.dashLine} />
-                    </View>
+                {/* Bar Chart with Faces */}
+                <View style={styles.chartContainer}>
+                    {/* Grid Lines */}
+                    {[1, 2, 3].map((_, i) => (
+                        <View key={i} style={styles.gridLine} />
+                    ))}
 
                     <View style={styles.barsRow}>
-                        {chartData.map((item, index) => (
-                            <View key={index} style={styles.barCol}>
-                                <View style={[styles.bar, { height: item.height, backgroundColor: item.color }]}>
-                                    <View style={styles.barIcon}>
-                                        <Ionicons name={item.icon as any} size={14} color="rgba(0,0,0,0.5)" />
+                        {/* Bars: Height %, Color, FaceType */}
+                        {[
+                            { h: '40%', c: '#8D6E63', f: 'sad' },
+                            { h: '30%', c: '#5D4037', f: 'sad' },
+                            { h: '70%', c: '#FBC02D', f: 'happy' }, // Yellow
+                            { h: '90%', c: '#8CAD65', f: 'happy' }, // Green
+                            { h: '50%', c: '#FF8A65', f: 'sad' }, // Orange
+                            { h: '20%', c: '#5D4037', f: 'sad' },
+                            { h: '40%', c: '#8D6E63', f: 'sad' },
+                        ].map((item, i) => (
+                            <View key={i} style={styles.barWrapper}>
+                                <View style={[styles.bar, { height: item.h, backgroundColor: item.c }]}>
+                                    <View style={styles.barFace}>
+                                        <Ionicons
+                                            name={item.f === 'happy' ? 'happy' : 'sad'}
+                                            size={14}
+                                            color={item.h === '90%' || item.h === '70%' ? '#FFF' : 'rgba(255,255,255,0.5)'}
+                                        />
                                     </View>
                                 </View>
                             </View>
@@ -81,10 +97,12 @@ export default function MoodStatsScreen() {
                     </View>
                 </View>
 
-                {/* Floating Add Button overlapping the bottom nav area */}
-                <TouchableOpacity style={styles.fab} onPress={() => router.push('/mood/new')}>
-                    <Ionicons name="add" size={32} color="#FFF" />
-                </TouchableOpacity>
+                {/* Add Entry FAB */}
+                <View style={styles.fabContainer}>
+                    <TouchableOpacity onPress={() => router.push('/mood/new')} style={styles.greenFab}>
+                        <Ionicons name="add" size={32} color="#FFF" />
+                    </TouchableOpacity>
+                </View>
 
             </View>
         </View>
@@ -98,78 +116,62 @@ const styles = StyleSheet.create({
     },
     header: {
         height: '55%',
-        backgroundColor: '#3E2D23',
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
         position: 'relative',
-        overflow: 'hidden',
     },
     navBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: Spacing.l,
-        paddingTop: 60,
-        zIndex: 10,
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+        paddingHorizontal: Spacing.l, paddingTop: 60, zIndex: 10,
     },
     circleBtn: {
-        width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center',
+        width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center'
     },
-    headerTitle: {
-        fontSize: 18, color: '#FFF', fontWeight: 'bold',
+    headerTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+    badge: { backgroundColor: '#8D6E63', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+    badgeText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
+    heroContent: { alignItems: 'center', marginTop: 20, zIndex: 10 },
+    heroSub: { color: '#AAA', fontSize: 16 },
+    heroTitle: { fontSize: 48, fontWeight: 'bold', color: '#FFF', fontFamily: Typography.heading, marginVertical: 4 },
+    faceCircle: {
+        width: 120, height: 120, borderRadius: 60, backgroundColor: '#C8A087',
+        alignItems: 'center', justifyContent: 'center',
+        marginBottom: 20, marginTop: 10,
     },
-    levelBadge: {
-        paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#8D6E63', borderRadius: 20,
-    },
-    levelText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
-    heroContent: {
-        alignItems: 'center', marginTop: 40, zIndex: 10,
-    },
-    heroSub: { color: '#FFF', fontSize: 16 },
-    heroTitle: { fontSize: 48, fontWeight: 'bold', color: '#FFF', fontFamily: Typography.heading, marginVertical: 10 },
-    faceContainer: {
-        flexDirection: 'row', alignItems: 'center', gap: 20, marginTop: 20,
-    },
-    hugeFace: {
-        width: 120, height: 120, borderRadius: 60, backgroundColor: '#C8A087', alignItems: 'center', justifyContent: 'center',
-    },
+    sliderRow: { flexDirection: 'row', alignItems: 'center', width: '60%' },
     statsSection: {
         flex: 1,
-        padding: Spacing.l,
         backgroundColor: '#1F1610',
+        paddingHorizontal: Spacing.l,
+        paddingTop: 20,
     },
-    statsHeader: {
+    sectionHeader: {
         flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20,
     },
-    statsTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
-    chartArea: {
-        height: 250,
-        justifyContent: 'flex-end',
-        position: 'relative',
+    sectionTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+    chartContainer: {
+        height: 200, justifyContent: 'flex-end', position: 'relative',
     },
-    gridLines: {
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'space-between',
-    },
-    dashLine: {
-        height: 1, backgroundColor: 'rgba(255,255,255,0.1)', width: '100%', borderStyle: 'dashed', borderRadius: 1,
+    gridLine: {
+        width: '100%', height: 1, backgroundColor: 'rgba(255,255,255,0.05)', marginBottom: 50,
     },
     barsRow: {
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: '100%',
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: 200,
     },
-    barCol: {
-        width: 30, alignItems: 'center', justifyContent: 'flex-end', height: '100%',
+    barWrapper: {
+        width: 30, height: '100%', justifyContent: 'flex-end', alignItems: 'center',
     },
     bar: {
-        width: 30, borderTopLeftRadius: 15, borderTopRightRadius: 15, alignItems: 'center', paddingTop: 8,
+        width: '100%', borderTopLeftRadius: 15, borderTopRightRadius: 15, alignItems: 'center', paddingTop: 6,
     },
-    barIcon: {
-        width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center'
+    barFace: {
+        width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.1)', alignItems: 'center', justifyContent: 'center',
     },
-    fab: {
-        position: 'absolute', bottom: -10, alignSelf: 'center',
-        width: 70, height: 70, borderRadius: 35, backgroundColor: '#8CAD65',
+    fabContainer: {
+        position: 'absolute', bottom: 100, width: '100%', alignItems: 'center',
+    },
+    greenFab: {
+        width: 60, height: 60, borderRadius: 30, backgroundColor: '#8CAD65',
         alignItems: 'center', justifyContent: 'center',
-        shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 4, elevation: 5,
-        borderWidth: 4, borderColor: '#2f2723'
-    }
+        shadowColor: "#8CAD65", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 10, elevation: 5,
+    },
 });
