@@ -10,8 +10,8 @@ const { width } = Dimensions.get('window');
 // Mock Data for Stress Chart (Last 7 Days)
 const data = [4, 6, 3, 7, 5, 4, 3]; // Scale 1-10
 const maxVal = 10;
-const chartHeight = 200;
-const chartWidth = width - 40;
+const chartHeight = 180;
+const chartWidth = width - 80; // adjusted for padding
 const stepX = chartWidth / (data.length - 1);
 
 // Generate Path String
@@ -40,12 +40,12 @@ const getFillPath = () => {
 export default function StressScreen() {
     return (
         <View style={styles.container}>
-            {/* Header Area */}
-            <View style={styles.orangeHeader}>
+            {/* Header Area - Deep Brown Base with Yellow/Orange Waves */}
+            <View style={styles.header}>
                 <Svg height="100%" width={width} style={StyleSheet.absoluteFillObject}>
-                    {/* Wavy Background Pattern */}
-                    <Path d={`M0,150 Q${width / 2},200 ${width},100 L${width},0 L0,0 Z`} fill="#F57F17" opacity={0.8} />
-                    <Path d={`M0,100 Q${width / 2},150 ${width},50 L${width},0 L0,0 Z`} fill="#F9A825" opacity={0.6} />
+                    <Path d={`M0,0 L${width},0 L${width},250 Q${width / 2},350 0,250 Z`} fill="#2C211B" />
+                    {/* Decorative Wave */}
+                    <Path d={`M0,200 Q${width / 2},300 ${width},200`} stroke="#FBC02D" strokeWidth="2" fill="none" opacity={0.3} />
                 </Svg>
 
                 <View style={styles.navBar}>
@@ -56,12 +56,29 @@ export default function StressScreen() {
                     <View style={styles.badge}><Text style={styles.badgeText}>WEEKLY</Text></View>
                 </View>
 
+                {/* Hero Circular Gauge */}
                 <View style={styles.heroContent}>
-                    <View style={styles.levelCircle}>
-                        <Text style={styles.levelVal}>3</Text>
-                        <Text style={styles.levelLabel}>Normal</Text>
+                    <View style={styles.gaugeContainer}>
+                        <Svg width="180" height="180">
+                            {/* Background Circle */}
+                            <Circle cx="90" cy="90" r="80" stroke="#3E2D23" strokeWidth="15" />
+                            {/* Progress (3/10 = 30%) */}
+                            <Circle
+                                cx="90" cy="90" r="80"
+                                stroke="#FBC02D" // Yellow Gold
+                                strokeWidth="15"
+                                strokeDasharray={`${2 * Math.PI * 80 * 0.3} ${2 * Math.PI * 80}`}
+                                strokeLinecap="round"
+                                transform="rotate(-90 90 90)"
+                            />
+                        </Svg>
+                        <View style={styles.gaugeInner}>
+                            <Ionicons name="flash" size={32} color="#FBC02D" />
+                            <Text style={styles.gaugeVal}>3</Text>
+                            <Text style={styles.gaugeLabel}>Normal</Text>
+                        </View>
                     </View>
-                    <Text style={styles.heroSub}>You're doing great!</Text>
+                    <Text style={styles.heroSub}>You're handling it well!</Text>
                 </View>
             </View>
 
@@ -94,8 +111,8 @@ export default function StressScreen() {
                                     key={i}
                                     cx={i * stepX}
                                     cy={chartHeight - (val / maxVal) * chartHeight}
-                                    r="4"
-                                    fill="#FFF"
+                                    r="5"
+                                    fill="#1F1610" // Dark center
                                     stroke="#FBC02D"
                                     strokeWidth="2"
                                 />
@@ -112,20 +129,30 @@ export default function StressScreen() {
                 {/* Analysis Cards */}
                 <Text style={styles.sectionTitle}>Analysis</Text>
 
-                <View style={styles.card}>
-                    <View style={styles.cardIconFn}><Ionicons name="flash" size={20} color="#FBC02D" /></View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.cardTitle}>Main Stressor</Text>
-                        <Text style={styles.cardSub}>Work deadline on Thursday caused a spike.</Text>
+                <View style={styles.analysisRow}>
+                    <View style={[styles.miniCard, { marginRight: 12, backgroundColor: '#3E2723' }]}>
+                        <View style={[styles.miniIcon, { backgroundColor: 'rgba(251, 192, 45, 0.2)' }]}>
+                            <Ionicons name="warning" size={20} color="#FBC02D" />
+                        </View>
+                        <Text style={styles.miniTitle}>Peak</Text>
+                        <Text style={styles.miniVal}>Thu 14:00</Text>
+                    </View>
+                    <View style={[styles.miniCard, { backgroundColor: '#2E3B28' }]}>
+                        <View style={[styles.miniIcon, { backgroundColor: 'rgba(140, 173, 101, 0.2)' }]}>
+                            <Ionicons name="leaf" size={20} color="#8CAD65" />
+                        </View>
+                        <Text style={styles.miniTitle}>Lowest</Text>
+                        <Text style={styles.miniVal}>Sat 09:00</Text>
                     </View>
                 </View>
 
                 <View style={styles.card}>
-                    <View style={styles.cardIconFn}><Ionicons name="fitness" size={20} color="#8CAD65" /></View>
+                    <View style={styles.cardIconFn}><Ionicons name="flash-outline" size={20} color="#FFF" /></View>
                     <View style={{ flex: 1 }}>
-                        <Text style={styles.cardTitle}>Relief Method</Text>
-                        <Text style={styles.cardSub}>Morning yoga helped reduce levels by 20%.</Text>
+                        <Text style={styles.cardTitle}>Main Stressor</Text>
+                        <Text style={styles.cardSub}>Work deadline on Thursday caused a spike.</Text>
                     </View>
+                    <Ionicons name="chevron-forward" size={20} color="#AAA" />
                 </View>
 
                 <View style={{ height: 100 }} />
@@ -139,54 +166,58 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#1F1610',
     },
-    orangeHeader: {
-        height: 300,
-        backgroundColor: '#FBC02D',
+    header: {
+        height: 380,
         position: 'relative',
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
-        overflow: 'hidden',
+        paddingTop: 60,
     },
     navBar: {
         flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-        paddingHorizontal: Spacing.l, paddingTop: 60,
+        paddingHorizontal: Spacing.l,
     },
     circleBtn: {
-        width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center'
+        width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center'
     },
     headerTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
-    badge: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+    badge: { backgroundColor: '#3E2D23', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#FBC02D' },
     badgeText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
-    heroContent: { alignItems: 'center', marginTop: 20 },
-    levelCircle: {
-        width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.2)',
-        alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFF',
-    },
-    levelVal: { fontSize: 32, fontWeight: 'bold', color: '#FFF' },
-    levelLabel: { fontSize: 10, color: '#FFF', fontWeight: 'bold' },
-    heroSub: { color: '#FFF', marginTop: 10, fontSize: 16, fontWeight: '600' },
+
+    heroContent: { alignItems: 'center', marginTop: 30 },
+    gaugeContainer: { alignItems: 'center', justifyContent: 'center', width: 180, height: 180 },
+    gaugeInner: { position: 'absolute', alignItems: 'center' },
+    gaugeVal: { fontSize: 48, fontWeight: 'bold', color: '#FFF', lineHeight: 56 },
+    gaugeLabel: { color: '#AAA', fontSize: 12, textTransform: 'uppercase' },
+    heroSub: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginTop: 20 },
+
     scrollContent: {
         padding: Spacing.l,
     },
     chartCard: {
         backgroundColor: '#332419',
         borderRadius: 24,
-        padding: 20,
+        padding: 24,
         marginBottom: 24,
-        marginTop: 10,
     },
-    chartTitle: { color: '#FFF', fontWeight: 'bold', marginBottom: 16 },
+    chartTitle: { color: '#AAA', fontWeight: 'bold', marginBottom: 20, fontSize: 12, textTransform: 'uppercase' },
     chartContainer: { alignItems: 'center' },
-    xAxis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-    dayLabel: { color: '#AAA', fontSize: 12, width: 30, textAlign: 'center' },
+    xAxis: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 16, width: '100%' },
+    dayLabel: { color: '#AAA', fontSize: 10, width: 30, textAlign: 'center' },
+
     sectionTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+
+    analysisRow: { flexDirection: 'row', marginBottom: 16 },
+    miniCard: { flex: 1, padding: 16, borderRadius: 20, alignItems: 'center' },
+    miniIcon: { width: 40, height: 40, borderRadius: 20, marginBottom: 8, alignItems: 'center', justifyContent: 'center' },
+    miniTitle: { color: '#AAA', fontSize: 12, marginBottom: 4 },
+    miniVal: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+
     card: {
         flexDirection: 'row', alignItems: 'center', backgroundColor: '#332419', padding: 16, borderRadius: 20, marginBottom: 12,
     },
     cardIconFn: {
-        width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.05)',
+        width: 40, height: 40, borderRadius: 20, backgroundColor: '#FBC02D',
         alignItems: 'center', justifyContent: 'center', marginRight: 16,
     },
     cardTitle: { color: '#FFF', fontWeight: 'bold', marginBottom: 4 },
-    cardSub: { color: '#AAA', fontSize: 13 },
+    cardSub: { color: '#AAA', fontSize: 13, lineHeight: 18 },
 });
