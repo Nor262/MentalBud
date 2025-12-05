@@ -86,9 +86,9 @@ export default function FreudScoreScreen() {
                     <Ionicons name="options-outline" size={20} color="#8D6E63" />
                 </View>
 
-                <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+                <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                     {scoreHistory.map((item, idx) => (
-                        <View key={idx} style={styles.historyCard}>
+                        <TouchableOpacity key={idx} style={styles.historyCard} onPress={() => router.push('/score-insights')}>
                             <View style={styles.dateBox}>
                                 <Text style={styles.month}>{item.date.split(' ')[0]}</Text>
                                 <Text style={styles.day}>{item.date.split(' ')[1]}</Text>
@@ -98,7 +98,7 @@ export default function FreudScoreScreen() {
                                 <Text style={styles.cardSub}>{item.sub}</Text>
                             </View>
                             <ScoreCircle score={item.score} color={item.color} />
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
 
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     bigScore: { fontSize: 96, fontWeight: 'bold', color: '#FFF', fontFamily: Typography.heading },
     congrats: { textAlign: 'center', color: '#FFF', fontSize: 16, opacity: 0.9, lineHeight: 24 },
     fabContainer: {
-        position: 'absolute', bottom: -28, width: '100%', alignItems: 'center', zIndex: 20
+        position: 'absolute', bottom: 5, width: '100%', alignItems: 'center', zIndex: 20
     },
     brownFab: {
         width: 70, height: 70, borderRadius: 35, backgroundColor: '#5D4037', // Brown

@@ -2,27 +2,58 @@ import { Spacing, Typography } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const MoodFace = ({ mood }: { mood: number }) => {
-    // 0 = Sad, 0.5 = Neutral, 1 = Happy
-    let iconName = "happy";
-    if (mood < 0.3) iconName = "sad";
-    else if (mood < 0.7) iconName = "remove"; // Neutral-ish line
-
-    return <Ionicons name={iconName as any} size={60} color="#5D4037" />;
-};
+const MOOD_IMAGES = [
+    require('../../assets/images/Depressed.png'),
+    require('../../assets/images/Sad.png'),
+    require('../../assets/images/Neutral.png'),
+    require('../../assets/images/Happy.png'),
+    require('../../assets/images/Overjoyed.png'),
+];
 
 export default function MoodStatsScreen() {
-    const [sliderVal, setSliderVal] = useState(0.5);
+    const [sliderVal, setSliderVal] = useState(0.5); // 0.5 = Neutral
+
+    // Helper to get image index from slider (0 to 1)
+    const getImageIndex = (val: number) => {
+        if (val <= 0.1) return 0;
+        if (val <= 0.35) return 1;
+        if (val <= 0.6) return 2;
+        if (val <= 0.85) return 3;
+        return 4;
+    };
+
+    // Labels mapping
+    const LABELS = ['Depressed', 'Sad', 'Neutral', 'Happy', 'Overjoyed'];
+    const idx = getImageIndex(sliderVal);
+    const currentLabel = LABELS[idx];
 
     return (
         <View style={styles.container}>
-            {/* Header Area */}
-            <View style={styles.header}>
+            {/* Header Area with Curved Background */}
+            <View style={styles.headerContainer}>
+                <Svg height="100%" width={width} style={StyleSheet.absoluteFillObject}>
+                    <Defs>
+                        <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                            <Stop offset="0" stopColor="#4E342E" stopOpacity="1" />
+                            <Stop offset="1" stopColor="#3E2723" stopOpacity="1" />
+                        </LinearGradient>
+                    </Defs>
+                    {/* Background Fill */}
+                    <Path d={`M0,0 L${width},0 L${width},420 Q${width / 2},500 0,420 Z`} fill="url(#grad)" />
+
+                    {/* Pattern Lines (Wood Grain / Ripples) */}
+                    <Circle cx={width / 2} cy="0" r="100" stroke="rgba(255,255,255,0.03)" strokeWidth="20" fill="none" />
+                    <Circle cx={width / 2} cy="0" r="200" stroke="rgba(255,255,255,0.03)" strokeWidth="20" fill="none" />
+                    <Circle cx={width / 2} cy="0" r="300" stroke="rgba(255,255,255,0.03)" strokeWidth="20" fill="none" />
+                    <Circle cx={width / 2} cy="0" r="400" stroke="rgba(255,255,255,0.03)" strokeWidth="20" fill="none" />
+                    <Circle cx={width / 2} cy="0" r="500" stroke="rgba(255,255,255,0.03)" strokeWidth="20" fill="none" />
+                </Svg>
+
                 <View style={styles.navBar}>
                     <TouchableOpacity onPress={() => router.back()} style={styles.circleBtn}>
                         <Ionicons name="chevron-back" size={24} color="#FFF" />
@@ -31,79 +62,78 @@ export default function MoodStatsScreen() {
                     <View style={styles.badge}><Text style={styles.badgeText}>LEVEL 3</Text></View>
                 </View>
 
-                {/* Mood Hero */}
+                {/* Hero Content */}
                 <View style={styles.heroContent}>
                     <Text style={styles.heroSub}>Your mood is</Text>
-                    <Text style={styles.heroTitle}>Neutral</Text>
+                    <Text style={styles.heroTitle}>{currentLabel}</Text>
 
-                    {/* Face Slider Display */}
-                    <View style={styles.faceCircle}>
-                        <MoodFace mood={sliderVal} />
-                    </View>
+                    {/* Face Display */}
+                    <View style={styles.faceContainer}>
+                        {/* Left Arrow */}
+                        <TouchableOpacity onPress={() => setSliderVal(Math.max(0, sliderVal - 0.25))}>
+                            <Ionicons name="chevron-back" size={24} color="rgba(255,255,255,0.5)" />
+                        </TouchableOpacity>
 
-                    {/* Use arrows to simulate the 'slider' visual from current image, or actual slider */}
-                    <View style={styles.sliderRow}>
-                        <Ionicons name="chevron-back" size={20} color="#AAA" />
-                        <View style={{ flex: 1, paddingHorizontal: 20 }}>
-                            {/* Dummy indicators */}
-                            <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2 }} />
+                        <View style={styles.faceCircle}>
+                            {/* Image with Fade support if possible, but for now direct switch */}
+                            <Image
+                                source={MOOD_IMAGES[idx]}
+                                style={{ width: 120, height: 120, resizeMode: 'contain' }}
+                            />
                         </View>
-                        <Ionicons name="chevron-forward" size={20} color="#AAA" />
+
+                        {/* Right Arrow */}
+                        <TouchableOpacity onPress={() => setSliderVal(Math.min(1, sliderVal + 0.25))}>
+                            <Ionicons name="chevron-forward" size={24} color="rgba(255,255,255,0.5)" />
+                        </TouchableOpacity>
                     </View>
                 </View>
-
-                <Svg height="100%" width={width} style={[StyleSheet.absoluteFillObject, { zIndex: -1 }]}>
-                    <Path d={`M0,350 Q${width / 2},450 ${width},350 L${width},0 L0,0 Z`} fill="#3E2D23" />
-                </Svg>
             </View>
 
-            {/* Stats Section */}
+            {/* Statistics Section */}
             <View style={styles.statsSection}>
                 <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>Mood Statistics</Text>
-                    <Ionicons name="ellipsis-vertical" size={16} color="#AAA" />
+                    <Ionicons name="ellipsis-vertical" size={20} color="#8D6E63" />
                 </View>
 
-                {/* Bar Chart with Faces */}
+                {/* Chart */}
                 <View style={styles.chartContainer}>
-                    {/* Grid Lines */}
+                    {/* Dashed Grid Lines */}
                     {[1, 2, 3].map((_, i) => (
                         <View key={i} style={styles.gridLine} />
                     ))}
 
                     <View style={styles.barsRow}>
-                        {/* Bars: Height %, Color, FaceType */}
+                        {/* Data */}
                         {[
-                            { h: '40%', c: '#8D6E63', f: 'sad' },
-                            { h: '30%', c: '#5D4037', f: 'sad' },
-                            { h: '70%', c: '#FBC02D', f: 'happy' }, // Yellow
-                            { h: '90%', c: '#8CAD65', f: 'happy' }, // Green
-                            { h: '50%', c: '#FF8A65', f: 'sad' }, // Orange
-                            { h: '20%', c: '#5D4037', f: 'sad' },
-                            { h: '40%', c: '#8D6E63', f: 'sad' },
+                            { h: 30, c: '#8D6E63', f: 'sad' },   // Brown
+                            { h: 20, c: '#5D4037', f: 'sad' },   // Dark Brown
+                            { h: 60, c: '#FBC02D', f: 'happy' }, // Yellow
+                            { h: 80, c: '#8CAD65', f: 'happy' }, // Green
+                            { h: 45, c: '#FF8A65', f: 'sad' },   // Orange
+                            { h: 25, c: '#5D4037', f: 'sad' },
+                            { h: 35, c: '#8D6E63', f: 'sad' },
                         ].map((item, i) => (
                             <View key={i} style={styles.barWrapper}>
-                                <View style={[styles.bar, { height: item.h, backgroundColor: item.c }]}>
+                                <View style={[styles.bar, { height: `${item.h}%`, backgroundColor: item.c }]}>
                                     <View style={styles.barFace}>
-                                        <Ionicons
-                                            name={item.f === 'happy' ? 'happy' : 'sad'}
-                                            size={14}
-                                            color={item.h === '90%' || item.h === '70%' ? '#FFF' : 'rgba(255,255,255,0.5)'}
-                                        />
+                                        {/* Simple face logic */}
+                                        <View style={{ flexDirection: 'row', gap: 2 }}>
+                                            <View style={styles.tinyEye} />
+                                            <View style={styles.tinyEye} />
+                                        </View>
+                                        <View style={[
+                                            styles.tinyMouth,
+                                            item.f === 'happy' ? { borderBottomWidth: 1.5, borderTopWidth: 0, borderRadius: 0, borderBottomLeftRadius: 5, borderBottomRightRadius: 5, height: 4 }
+                                                : { borderTopWidth: 1.5, borderRadius: 5, height: 4 }
+                                        ]} />
                                     </View>
                                 </View>
                             </View>
                         ))}
                     </View>
                 </View>
-
-                {/* Add Entry FAB */}
-                <View style={styles.fabContainer}>
-                    <TouchableOpacity onPress={() => router.push('/mood/new')} style={styles.greenFab}>
-                        <Ionicons name="add" size={32} color="#FFF" />
-                    </TouchableOpacity>
-                </View>
-
             </View>
         </View>
     );
@@ -112,66 +142,120 @@ export default function MoodStatsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1F1610',
+        backgroundColor: '#1F1410',
     },
-    header: {
-        height: '55%',
-        position: 'relative',
+    headerContainer: {
+        height: 500, // Taller header to accommodate curve
+        width: '100%',
+        position: 'absolute',
+        top: 0,
     },
     navBar: {
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-        paddingHorizontal: Spacing.l, paddingTop: 60, zIndex: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: Spacing.l,
+        marginTop: 60,
     },
     circleBtn: {
-        width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center'
+        width: 44, height: 44, borderRadius: 22,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)',
+        alignItems: 'center', justifyContent: 'center'
     },
-    headerTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
-    badge: { backgroundColor: '#8D6E63', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
-    badgeText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
-    heroContent: { alignItems: 'center', marginTop: 20, zIndex: 10 },
-    heroSub: { color: '#AAA', fontSize: 16 },
-    heroTitle: { fontSize: 48, fontWeight: 'bold', color: '#FFF', fontFamily: Typography.heading, marginVertical: 4 },
+    headerTitle: {
+        color: '#FFF', fontSize: 18, fontWeight: 'bold', fontFamily: Typography.heading,
+    },
+    badge: {
+        backgroundColor: '#8D6E63', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
+    },
+    badgeText: {
+        color: '#FFF', fontSize: 10, fontWeight: 'bold', letterSpacing: 1,
+    },
+    heroContent: {
+        alignItems: 'center',
+        marginTop: 40,
+    },
+    heroSub: {
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 18,
+        marginBottom: 8,
+    },
+    heroTitle: {
+        fontSize: 56,
+        fontWeight: 'bold',
+        color: '#FFF',
+        fontFamily: Typography.heading,
+        letterSpacing: -1,
+    },
+    faceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 30,
+        marginTop: 30,
+    },
     faceCircle: {
-        width: 120, height: 120, borderRadius: 60, backgroundColor: '#C8A087',
+        width: 140, height: 140, borderRadius: 70,
+        backgroundColor: '#C8A087', // Skin tone
         alignItems: 'center', justifyContent: 'center',
-        marginBottom: 20, marginTop: 10,
+        shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 20, shadowOffset: { width: 0, height: 10 },
     },
-    sliderRow: { flexDirection: 'row', alignItems: 'center', width: '60%' },
+    eye: {
+        width: 12, height: 20, backgroundColor: '#4E342E', borderRadius: 6,
+    },
+    neutralMouth: {
+        width: 50, height: 6, backgroundColor: '#4E342E', borderRadius: 3, marginTop: 4,
+    },
     statsSection: {
+        marginTop: 500, // Push below header
         flex: 1,
-        backgroundColor: '#1F1610',
         paddingHorizontal: Spacing.l,
-        paddingTop: 20,
     },
     sectionHeader: {
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20,
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30,
     },
-    sectionTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+    sectionTitle: {
+        color: '#FFF', fontSize: 20, fontWeight: 'bold', fontFamily: Typography.heading,
+    },
     chartContainer: {
-        height: 200, justifyContent: 'flex-end', position: 'relative',
+        height: 220,
+        justifyContent: 'flex-end',
     },
     gridLine: {
-        width: '100%', height: 1, backgroundColor: 'rgba(255,255,255,0.05)', marginBottom: 50,
+        width: '100%',
+        height: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        marginBottom: 60,
     },
     barsRow: {
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: 200,
+        position: 'absolute',
+        bottom: 0, left: 0, right: 0,
+        height: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        paddingHorizontal: 10,
     },
     barWrapper: {
-        width: 30, height: '100%', justifyContent: 'flex-end', alignItems: 'center',
+        width: 34, height: '100%', justifyContent: 'flex-end', alignItems: 'center',
     },
     bar: {
-        width: '100%', borderTopLeftRadius: 15, borderTopRightRadius: 15, alignItems: 'center', paddingTop: 6,
+        width: '100%',
+        borderTopLeftRadius: 17,
+        borderTopRightRadius: 17,
+        alignItems: 'center',
+        paddingTop: 10,
     },
     barFace: {
-        width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.1)', alignItems: 'center', justifyContent: 'center',
+        opacity: 0.6,
+        alignItems: 'center',
     },
-    fabContainer: {
-        position: 'absolute', bottom: 100, width: '100%', alignItems: 'center',
+    tinyEye: {
+        width: 3, height: 4, backgroundColor: '#3E2723', borderRadius: 1.5,
     },
-    greenFab: {
-        width: 60, height: 60, borderRadius: 30, backgroundColor: '#8CAD65',
-        alignItems: 'center', justifyContent: 'center',
-        shadowColor: "#8CAD65", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 10, elevation: 5,
-    },
+    tinyMouth: {
+        width: 12, borderColor: '#3E2723', marginTop: 2,
+    }
 });

@@ -38,7 +38,7 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
 
       {/* FAB - Absolute Center (Visually in the dip) */}
       <View style={styles.fabContainer} pointerEvents="box-none">
-        <TouchableOpacity onPress={() => router.push('/chat/new')} style={styles.fab}>
+        <TouchableOpacity onPress={() => router.push('/mood/new')} style={styles.fab}>
           <Ionicons name="add" size={32} color="#FFF" />
         </TouchableOpacity>
         <View style={styles.fabGlow} />

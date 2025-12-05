@@ -24,7 +24,9 @@ export default function ChatHistoryScreen() {
                     <TouchableOpacity onPress={() => router.back()} style={styles.circleBtn}>
                         <Ionicons name="chevron-back" size={24} color="#FFF" />
                     </TouchableOpacity>
-                    <Ionicons name="cellular-outline" size={24} color="#FFF" />
+                    <TouchableOpacity onPress={() => router.push('/chat/new')} style={styles.circleBtn}>
+                        <Ionicons name="add" size={24} color="#FFF" />
+                    </TouchableOpacity>
                 </View>
 
                 <Text style={styles.bigTitle}>My Conversations</Text>
